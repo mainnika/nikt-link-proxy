@@ -16,6 +16,8 @@ type DataInterface interface {
 	MakeLink(fullURL string) (l Link, err error)
 	// ResolveLink resolves a short link by ID
 	ResolveLink(linkID string) (l Link, err error)
+	// FireMetric increases a specific metric for a link
+	FireMetric(linkID string, metric Metric, mod int) (err error)
 }
 
 type Data struct{}
@@ -54,6 +56,12 @@ func (d *Data) MakeLink(fullURL string) (l Link, err error) {
 
 // ResolveLink resolves a short link by ID
 func (d *Data) ResolveLink(linkID string) (l Link, err error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+// FireMetric increases a specific metric for a link
+func (d *Data) FireMetric(linkID string, metric Metric, mod int) (err error) {
 	//TODO implement me
 	panic("implement me")
 }
