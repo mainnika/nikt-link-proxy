@@ -20,7 +20,10 @@ type DataInterface interface {
 	FireMetric(linkID string, metric Metric, mod int) (err error)
 }
 
-type Data struct{}
+// Data implements data handler that works with the source to manage links
+type Data struct {
+	dsource datasource.DataSource
+}
 
 // DataOpt is a functor to modify data opts
 type DataOpt func(d *Data) *Data
@@ -35,6 +38,14 @@ func NewData(opts ...DataOpt) (d *Data) {
 	}
 
 	return
+}
+
+// WithDataSource configures a data source
+func WithDataSource(dsource datasource.DataSource) DataOpt {
+	return func(d *Data) *Data {
+		d.dsource = dsource
+		return d
+	}
 }
 
 // SourceByContext returns database session from the routing context
