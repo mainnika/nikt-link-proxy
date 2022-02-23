@@ -10,8 +10,12 @@ import (
 
 var _ DataInterface = Data{}
 
-// DataInterface contains function to work with data
+// DataInterface is a data handler that manages links
 type DataInterface interface {
+	// MakeLink makes a short link data for a given full URL
+	MakeLink(fullURL string) (l Link, err error)
+	// ResolveLink resolves a short link by ID
+	ResolveLink(linkID string) (l Link, err error)
 }
 
 type Data struct{}
@@ -40,4 +44,16 @@ func (d Data) SourceByContext(c context.Context) (source datasource.DataSource) 
 	}
 
 	return
+}
+
+// MakeLink makes a short link data for a given full URL
+func (d *Data) MakeLink(fullURL string) (l Link, err error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+// ResolveLink resolves a short link by ID
+func (d *Data) ResolveLink(linkID string) (l Link, err error) {
+	//TODO implement me
+	panic("implement me")
 }
