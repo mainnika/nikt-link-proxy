@@ -8,7 +8,7 @@ import (
 	"code.tokarch.uk/mainnika/nikt-link-proxy/pkg/data/datasource"
 )
 
-var _ DataInterface = Data{}
+var _ DataInterface = (*Data)(nil)
 
 // DataInterface is a data handler that manages links
 type DataInterface interface {
@@ -21,12 +21,12 @@ type DataInterface interface {
 type Data struct{}
 
 // DataOpt is a functor to modify data opts
-type DataOpt func(d Data) Data
+type DataOpt func(d *Data) *Data
 
 // NewData creates a new data provider
-func NewData(opts ...DataOpt) (d Data) {
+func NewData(opts ...DataOpt) (d *Data) {
 
-	d = Data{}
+	d = &Data{}
 
 	for _, opt := range opts {
 		d = opt(d)
