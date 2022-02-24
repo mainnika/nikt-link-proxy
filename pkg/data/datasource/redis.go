@@ -18,6 +18,12 @@ func NewRedisSource(uc redis.UniversalClient) *RedisSource {
 	return &RedisSource{UniversalClient: uc}
 }
 
+// Sync initiates redis source initial state
+func (r *RedisSource) Sync(ctx context.Context) (err error) {
+	//TODO implement me
+	panic("implement me")
+}
+
 // CreateShortID returns the next unique shortID
 func (r *RedisSource) CreateShortID(ctx context.Context) (shortID string, err error) {
 	//TODO implement me

@@ -2,6 +2,8 @@ package datasource
 
 // DataSource is the interface to retrieve data from the source
 type DataSource interface {
+	// Sync initiates data source initial state
+	Sync(ctx context.Context) (err error)
 	// CreateShortID returns the next unique shortID
 	CreateShortID(ctx context.Context) (shortID string, err error)
 	// InsertURL saves a pair short→full

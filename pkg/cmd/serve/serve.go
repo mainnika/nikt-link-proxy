@@ -1,11 +1,13 @@
 package serve
 
 import (
+	"context"
 	"fmt"
 	"net"
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/go-redis/redis/v8"
 	"github.com/sirupsen/logrus"
@@ -45,6 +47,9 @@ func stopListener(signals <-chan os.Signal, listener net.Listener) {
 // Serve command runs http server and waits for the termination signal
 func Serve(cmd *cobra.Command, args []string) {
 
+	serveCtx, cancelCtx := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancelCtx()
+
 	config := Config{}
 	err := viper.Unmarshal(&config)
 	if err != nil {
@@ -54,6 +59,11 @@ func Serve(cmd *cobra.Command, args []string) {
 	redisClient := redis.NewUniversalClient(config.Redis)
 	redisSource := datasource.NewRedisSource(redisClient)
 	apiData := data.NewData(data.WithDataSource(redisSource))
+
+	err = redisSource.Sync(serveCtx)
+	if err != nil {
+		logrus.Fatalf("Cannot sync redis source, %v", err)
+	}
 
 	apiHandler := api.New(api.Config{
 		Base: config.Base,
