@@ -2,3 +2,9 @@ verbose: true
 base: ~
 addr: 127.0.0.1:8080
 unix: ~
+redis:
+  addrs:
+    - localhost:6379
+  db: 0
+  username: ~
+  password: ~
