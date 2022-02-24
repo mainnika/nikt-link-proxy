@@ -7,12 +7,15 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/go-redis/redis/v8"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/valyala/fasthttp"
 
 	"code.tokarch.uk/mainnika/nikt-link-proxy/pkg/api"
+	"code.tokarch.uk/mainnika/nikt-link-proxy/pkg/data"
+	"code.tokarch.uk/mainnika/nikt-link-proxy/pkg/data/datasource"
 )
 
 func createListener(tcpAddr, unixAddr string) (listener net.Listener, err error) {
@@ -48,10 +51,14 @@ func Serve(cmd *cobra.Command, args []string) {
 		logrus.Warnf("Cannot unmarshal config, %v", err)
 	}
 
-	apiConfig := api.Config{
+	redisClient := redis.NewUniversalClient(config.Redis)
+	redisSource := datasource.NewRedisSource(redisClient)
+	apiData := data.NewData(data.WithDataSource(redisSource))
+
+	apiHandler := api.New(api.Config{
 		Base: config.Base,
-	}
-	apiHandler := api.New(apiConfig)
+		Data: apiData,
+	})
 
 	httpServer := fasthttp.Server{
 		Logger:  logrus.StandardLogger(),
