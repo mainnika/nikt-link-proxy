@@ -13,11 +13,11 @@ var _ DataInterface = (*Data)(nil)
 // DataInterface is a data handler that manages links
 type DataInterface interface {
 	// MakeLink makes a short link data for a given full URL
-	MakeLink(fullURL string) (l Link, err error)
+	MakeLink(ctx context.Context, fullURL string) (l Link, err error)
 	// ResolveLink resolves a short link by ID
-	ResolveLink(linkID string) (l Link, err error)
+	ResolveLink(ctx context.Context, linkID string) (l Link, err error)
 	// FireMetric increases a specific metric for a link
-	FireMetric(linkID string, metric Metric, mod int) (err error)
+	FireMetric(ctx context.Context, linkID string, metric Metric, mod int) (err error)
 }
 
 // Data implements data handler that works with the source to manage links
@@ -60,19 +60,38 @@ func (d Data) SourceByContext(c context.Context) (source datasource.DataSource) 
 }
 
 // MakeLink makes a short link data for a given full URL
-func (d *Data) MakeLink(fullURL string) (l Link, err error) {
-	//TODO implement me
-	panic("implement me")
+func (d *Data) MakeLink(ctx context.Context, fullURL string) (l Link, err error) {
+
+	shortID, err := d.dsource.CreateShortID(ctx)
+	if err != nil {
+		return
+	}
+
+	err = d.dsource.InsertURL(ctx, shortID, fullURL)
+	if err != nil {
+		return
+	}
+
+	l = Link{ID: shortID, FullURL: fullURL}
+
+	return
 }
 
 // ResolveLink resolves a short link by ID
-func (d *Data) ResolveLink(linkID string) (l Link, err error) {
-	//TODO implement me
-	panic("implement me")
+func (d *Data) ResolveLink(ctx context.Context, linkID string) (l Link, err error) {
+
+	fullURL, err := d.dsource.GetFull(ctx, linkID)
+	if err != nil {
+		return
+	}
+
+	l = Link{ID: linkID, FullURL: fullURL}
+
+	return
 }
 
 // FireMetric increases a specific metric for a link
-func (d *Data) FireMetric(linkID string, metric Metric, mod int) (err error) {
-	//TODO implement me
-	panic("implement me")
+func (d *Data) FireMetric(ctx context.Context, linkID string, metric Metric, mod int) (err error) {
+	err = d.dsource.AddMetric(ctx, linkID, int(metric), mod)
+	return
 }
