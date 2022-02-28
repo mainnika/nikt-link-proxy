@@ -60,17 +60,27 @@ func (d Data) SourceByContext(c context.Context) (source datasource.DataSource) 
 // MakeLink makes a short link data for a given full URL
 func (d *Data) MakeLink(ctx context.Context, fullURL string) (l Link, err error) {
 
+	createdLink, err := NewLink("", fullURL)
+	if err != nil {
+		return
+	}
+
 	possibleID, err := d.dsource.CreateShortID(ctx)
 	if err != nil {
 		return
 	}
 
-	insertedID, err := d.dsource.InsertURL(ctx, possibleID, fullURL)
+	createdLink.ID, err = d.dsource.InsertURL(ctx, possibleID, fullURL)
 	if err != nil {
 		return
 	}
 
-	l = Link{ID: insertedID, FullURL: fullURL}
+	err = createdLink.Valid()
+	if err != nil {
+		return
+	}
+
+	l = createdLink
 
 	return
 }
@@ -83,7 +93,17 @@ func (d *Data) ResolveLink(ctx context.Context, linkID string) (l Link, err erro
 		return
 	}
 
-	l = Link{ID: linkID, FullURL: fullURL}
+	createdLink, err := NewLink(linkID, fullURL)
+	if err != nil {
+		return
+	}
+
+	err = createdLink.Valid()
+	if err != nil {
+		return
+	}
+
+	l = createdLink
 
 	return
 }
