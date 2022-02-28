@@ -16,7 +16,6 @@ const (
 	redisKeyURLMetadata = "%s:metadata"
 	redisKeyURLReversed = "%s:reversed"
 	redisKeyURLFull     = "%s:full"
-	redisKeyURLMetric   = "%s:metrica:%d"
 )
 
 var _ DataSource = (*RedisSource)(nil)
@@ -118,21 +117,6 @@ func (r *RedisSource) GetFull(ctx context.Context, shortID string) (fullURL stri
 	return
 }
 
-// AddMetric modifies a metric data
-func (r *RedisSource) AddMetric(ctx context.Context, shortID string, metricID int, dataMod int) (err error) {
-
-	intCmd := r.IncrBy(ctx, r.getKeyURLMetrica(shortID, metricID), int64(dataMod))
-	err = intCmd.Err()
-
-	return
-}
-
-// GetMetric loads a metric data
-func (r *RedisSource) GetMetric(ctx context.Context, shortID string, metricID int) (data int, err error) {
-	//TODO implement me
-	panic("implement me")
-}
-
 func (r *RedisSource) getKeyLastID() string {
 	return redisKeyLastID
 }
@@ -144,7 +128,4 @@ func (r *RedisSource) getKeyURLReversed(hash []byte) string {
 }
 func (r *RedisSource) getKeyURLFull(id string) string {
 	return fmt.Sprintf(redisKeyURLFull, id)
-}
-func (r *RedisSource) getKeyURLMetrica(id string, metricaID int) string {
-	return fmt.Sprintf(redisKeyURLMetric, id, metricaID)
 }

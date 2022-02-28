@@ -16,8 +16,6 @@ type DataInterface interface {
 	MakeLink(ctx context.Context, fullURL string) (l Link, err error)
 	// ResolveLink resolves a short link by ID
 	ResolveLink(ctx context.Context, linkID string) (l Link, err error)
-	// FireMetric increases a specific metric for a link
-	FireMetric(ctx context.Context, linkID string, metric Metric, mod int) (err error)
 }
 
 // Data implements data handler that works with the source to manage links
@@ -87,11 +85,5 @@ func (d *Data) ResolveLink(ctx context.Context, linkID string) (l Link, err erro
 
 	l = Link{ID: linkID, FullURL: fullURL}
 
-	return
-}
-
-// FireMetric increases a specific metric for a link
-func (d *Data) FireMetric(ctx context.Context, linkID string, metric Metric, mod int) (err error) {
-	err = d.dsource.AddMetric(ctx, linkID, int(metric), mod)
 	return
 }
