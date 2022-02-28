@@ -7,11 +7,14 @@ import (
 	"net/url"
 
 	"github.com/go-redis/redis/v8"
+
+	"code.tokarch.uk/mainnika/nikt-link-proxy/pkg/utils"
 )
 
 const (
 	redisKeyLastID      = "lastID"
 	redisKeyURLMetadata = "%s:metadata"
+	redisKeyURLReversed = "%s:reversed"
 	redisKeyURLFull     = "%s:full"
 	redisKeyURLMetric   = "%s:metrica:%d"
 )
@@ -91,10 +94,15 @@ func (r *RedisSource) InsertURL(ctx context.Context, shortID, fullURL string, me
 	}
 
 	metadataEncoded := metadataValues.Encode()
+	hashed, err := utils.HashStrings(fullURL, metadataEncoded)
+	if err != nil {
+		return
+	}
 
 	p := r.Pipeline()
 	_ = p.SetNX(ctx, r.getKeyURLFull(shortID), fullURL, 0)
 	_ = p.SetNX(ctx, r.getKeyURLMetadata(shortID), metadataEncoded, 0)
+	_ = p.Set(ctx, r.getKeyURLReversed(hashed[:]), shortID, 0)
 
 	_, err = p.Exec(ctx)
 
@@ -130,6 +138,9 @@ func (r *RedisSource) getKeyLastID() string {
 }
 func (r *RedisSource) getKeyURLMetadata(id string) string {
 	return fmt.Sprintf(redisKeyURLMetadata, id)
+}
+func (r *RedisSource) getKeyURLReversed(hash []byte) string {
+	return fmt.Sprintf(redisKeyURLReversed, hash)
 }
 func (r *RedisSource) getKeyURLFull(id string) string {
 	return fmt.Sprintf(redisKeyURLFull, id)
