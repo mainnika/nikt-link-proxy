@@ -3,6 +3,8 @@ base: ~
 addr: 127.0.0.1:8080
 unix: ~
 redis:
+  p: 17248111889498283943
+  q: 5786827
   addrs:
     - localhost:6379
   db: 0

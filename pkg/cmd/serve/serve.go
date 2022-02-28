@@ -56,8 +56,11 @@ func Serve(cmd *cobra.Command, args []string) {
 		logrus.Warnf("Cannot unmarshal config, %v", err)
 	}
 
-	redisClient := redis.NewUniversalClient(config.Redis)
-	redisSource := datasource.NewRedisSource(redisClient)
+	logrus.Infof("Version: %s", cmd.Version)
+	logrus.Debugf("Config: %#v", config)
+
+	redisClient := redis.NewUniversalClient(&config.Redis.UniversalOptions)
+	redisSource := datasource.NewRedisSource(redisClient, datasource.WithRedisPQ(config.Redis.P, config.Redis.Q))
 	apiData := data.NewData(data.WithDataSource(redisSource))
 
 	err = redisSource.Sync(serveCtx)
@@ -83,9 +86,7 @@ func Serve(cmd *cobra.Command, args []string) {
 	signal.Notify(signals, syscall.SIGINT, syscall.SIGTERM)
 	go stopListener(signals, httpListener)
 
-	logrus.Infof("Version: %s", cmd.Version)
 	logrus.Debugf("Listen: %s", httpListener.Addr().String())
-	logrus.Debugf("Config: %#v", config)
 
 	err = httpServer.Serve(httpListener)
 	if err != nil {

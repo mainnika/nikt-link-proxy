@@ -7,10 +7,15 @@ import (
 
 // Config contains serve configuration
 type Config struct {
-	Base  string                  `mapstructure:"base"`
-	Addr  string                  `mapstructure:"addr"`
-	Unix  string                  `mapstructure:"unix"`
-	Redis *redis.UniversalOptions `mapstructure:"redis"`
+	Base  string `mapstructure:"base"`
+	Addr  string `mapstructure:"addr"`
+	Unix  string `mapstructure:"unix"`
+	Redis struct {
+		redis.UniversalOptions `mapstructure:",squash"`
+
+		P string
+		Q uint64
+	} `mapstructure:"redis"`
 }
 
 func InitFlags(flags *pflag.FlagSet) {

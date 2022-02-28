@@ -2,9 +2,10 @@ package datasource
 
 import (
 	"context"
+	"encoding/base64"
 	"fmt"
+	"math/big"
 	"net/url"
-	"strconv"
 
 	"github.com/go-redis/redis/v8"
 )
@@ -21,11 +22,32 @@ var _ DataSource = (*RedisSource)(nil)
 // RedisSource uses redis database to handle link data
 type RedisSource struct {
 	redis.UniversalClient
+
+	p big.Int
+	q big.Int
+}
+
+// RedisOpt is a functor to initialize redis source values
+type RedisOpt func(*RedisSource) *RedisSource
+
+// WithRedisPQ initializes P and Q for data id generation
+func WithRedisPQ(p string, q uint64) RedisOpt {
+	return func(s *RedisSource) *RedisSource {
+		s.p.SetString(p, 10)
+		s.q.SetUint64(q)
+		return s
+	}
 }
 
 // NewRedisSource creates a new redis source
-func NewRedisSource(uc redis.UniversalClient) *RedisSource {
-	return &RedisSource{UniversalClient: uc}
+func NewRedisSource(uc redis.UniversalClient, opts ...RedisOpt) (source *RedisSource) {
+
+	source = &RedisSource{UniversalClient: uc}
+	for _, f := range opts {
+		source = f(source)
+	}
+
+	return source
 }
 
 // Sync initiates redis source initial state
@@ -44,7 +66,17 @@ func (r *RedisSource) CreateShortID(ctx context.Context) (shortID string, err er
 		return
 	}
 
-	shortID = strconv.FormatUint(lastID, alphabetSize)
+	bigLastID := &big.Int{}
+	bigLastID.SetUint64(lastID)
+
+	bigShortID := &big.Int{}
+	bigShortID.Mul(bigLastID, &r.p)
+	bigShortID.Mod(bigShortID, &r.q)
+
+	var shortIDbytes [8]byte
+	bigShortID.FillBytes(shortIDbytes[:])
+
+	shortID = base64.RawURLEncoding.EncodeToString(shortIDbytes[:])
 
 	return
 }
