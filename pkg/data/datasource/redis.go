@@ -2,7 +2,6 @@ package datasource
 
 import (
 	"context"
-	"encoding/base64"
 	"fmt"
 	"math/big"
 	"net/url"
@@ -72,10 +71,13 @@ func (r *RedisSource) CreateShortID(ctx context.Context) (shortID string, err er
 	bigShortID.Mul(bigLastID, &r.p)
 	bigShortID.Mod(bigShortID, &r.q)
 
-	var shortIDbytes [8]byte
+	var shortIDbytes [shortIDbytesLength]byte
 	bigShortID.FillBytes(shortIDbytes[:])
 
-	shortID = base64.RawURLEncoding.EncodeToString(shortIDbytes[:])
+	shortIDencoded := makeEncoded(shortIDbytes)
+	shortIDtrimmed := makeTrimmed(shortIDencoded)
+
+	shortID = string(shortIDtrimmed)
 
 	return
 }

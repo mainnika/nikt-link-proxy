@@ -1,6 +1,15 @@
 package datasource
 
-import "context"
+import (
+	"bytes"
+	"context"
+	"encoding/base64"
+)
+
+const (
+	shortIDbytesLength   = 8
+	shortIDencodedLength = (shortIDbytesLength*8 + 5) / 6 // EncodedLen of shortIDbytesLength with no padding
+)
 
 // DataSource is the interface to retrieve data from the source
 type DataSource interface {
@@ -20,3 +29,12 @@ type DataSource interface {
 
 // MetadataOpts functor to add metadata to the url
 type MetadataOpts func(map[string][]string) map[string][]string
+
+func makeEncoded(shortIDbytes [shortIDbytesLength]byte) (shortIDencoded [shortIDencodedLength]byte) {
+	base64.RawURLEncoding.Encode(shortIDencoded[:], shortIDbytes[:])
+	return // must always fill whole buffer of shortIDencoded
+}
+func makeTrimmed(shortIDencoded [shortIDencodedLength]byte) (shortIDtrimmed []byte) {
+	shortIDtrimmed = bytes.TrimLeftFunc(shortIDencoded[:], func(r rune) bool { return r == 'A' })
+	return // returns slice of memory shortIDencoded, no alloc here
+}
