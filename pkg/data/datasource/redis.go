@@ -50,10 +50,9 @@ func NewRedisSource(uc redis.UniversalClient, opts ...RedisOpt) (source *RedisSo
 	return source
 }
 
-// Sync initiates redis source initial state
+// Sync does nothing in redis
 func (r *RedisSource) Sync(ctx context.Context) (err error) {
-	boolCmd := r.SetNX(ctx, redisKeyLastID, startID, 0)
-	return boolCmd.Err()
+	return
 }
 
 // CreateShortID returns the next unique shortID

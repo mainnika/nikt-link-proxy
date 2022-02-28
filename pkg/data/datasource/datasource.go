@@ -2,11 +2,6 @@ package datasource
 
 import "context"
 
-const (
-	alphabetSize = 36          // 0-9a-z
-	startID      = uint64(370) // aa
-)
-
 // DataSource is the interface to retrieve data from the source
 type DataSource interface {
 	// Sync initiates data source initial state
