@@ -7,6 +7,7 @@ import (
 	"net/url"
 
 	"github.com/go-redis/redis/v8"
+	"github.com/sirupsen/logrus"
 
 	"code.tokarch.uk/mainnika/nikt-link-proxy/pkg/utils"
 )
@@ -18,6 +19,29 @@ const (
 	redisKeyURLFull     = "%s:full"
 )
 
+const (
+	RedisScriptIDGetOrCreate = 0
+)
+
+var redisScriptsData = map[int]string{
+	RedisScriptIDGetOrCreate: `
+local existedShort = redis.call("get", KEYS[1]) or ""
+if existedShort ~= "" then
+  return existedShort
+end
+
+local isSet = redis.call("setnx", KEYS[2], ARGV[2])
+if isSet == 0 then
+  return error("dup")
+end
+
+redis.call("set", KEYS[1], ARGV[1])
+redis.call("set", KEYS[3], ARGV[3])
+
+return ARGV[1]
+`,
+}
+
 var _ DataSource = (*RedisSource)(nil)
 
 // RedisSource uses redis database to handle link data
@@ -26,6 +50,8 @@ type RedisSource struct {
 
 	p big.Int
 	q big.Int
+
+	scriptSHAs map[int]string
 }
 
 // RedisOpt is a functor to initialize redis source values
@@ -51,8 +77,31 @@ func NewRedisSource(uc redis.UniversalClient, opts ...RedisOpt) (source *RedisSo
 	return source
 }
 
-// Sync does nothing in redis
+// Sync initializes the redis scripts
 func (r *RedisSource) Sync(ctx context.Context) (err error) {
+
+	r.scriptSHAs = map[int]string{}
+
+	for _, scriptID := range []int{
+		RedisScriptIDGetOrCreate,
+	} {
+		script, hasScript := redisScriptsData[scriptID]
+		if !hasScript {
+			panic(fmt.Errorf("no script with id %d", scriptID))
+		}
+
+		stringCmd := r.ScriptLoad(ctx, script)
+		scriptSHA := ""
+		scriptSHA, err = stringCmd.Result()
+		if err != nil {
+			return
+		}
+
+		logrus.Debugf("Redis script load success, sha:%s", scriptSHA)
+
+		r.scriptSHAs[scriptID] = scriptSHA
+	}
+
 	return
 }
 
@@ -84,8 +133,8 @@ func (r *RedisSource) CreateShortID(ctx context.Context) (shortID string, err er
 	return
 }
 
-// InsertURL saves a pair short→full
-func (r *RedisSource) InsertURL(ctx context.Context, shortID, fullURL string, metadata ...MetadataOpts) (err error) {
+// InsertURL saves a pair short→full, in case of dup of fullURL+metadata returns the old value
+func (r *RedisSource) InsertURL(ctx context.Context, shortID, fullURL string, metadata ...MetadataOpts) (insertedID string, err error) {
 
 	metadataValues := url.Values{}
 	for _, m := range metadata {
@@ -98,12 +147,24 @@ func (r *RedisSource) InsertURL(ctx context.Context, shortID, fullURL string, me
 		return
 	}
 
-	p := r.Pipeline()
-	_ = p.SetNX(ctx, r.getKeyURLFull(shortID), fullURL, 0)
-	_ = p.SetNX(ctx, r.getKeyURLMetadata(shortID), metadataEncoded, 0)
-	_ = p.Set(ctx, r.getKeyURLReversed(hashed[:]), shortID, 0)
+	getOrCreate, hasScript := r.scriptSHAs[RedisScriptIDGetOrCreate]
+	if !hasScript {
+		panic(fmt.Errorf("no script sha in cache"))
+	}
 
-	_, err = p.Exec(ctx)
+	cmd := r.EvalSha(ctx,
+		getOrCreate,
+		[]string{
+			r.getKeyURLReversed(hashed[:]),
+			r.getKeyURLFull(shortID),
+			r.getKeyURLMetadata(shortID),
+		},
+		shortID,
+		fullURL,
+		metadataEncoded,
+	)
+
+	insertedID, err = cmd.Text()
 
 	return
 }

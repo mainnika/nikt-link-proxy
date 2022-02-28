@@ -17,8 +17,8 @@ type DataSource interface {
 	Sync(ctx context.Context) (err error)
 	// CreateShortID returns the next unique shortID
 	CreateShortID(ctx context.Context) (shortID string, err error)
-	// InsertURL saves a pair short→full
-	InsertURL(ctx context.Context, shortID, fullURL string, metadata ...MetadataOpts) (err error)
+	// InsertURL saves a pair short→full, in case of dup of fullURL+metadata returns the old value
+	InsertURL(ctx context.Context, shortID, fullURL string, metadata ...MetadataOpts) (insertedID string, err error)
 	// GetFull loads a saved full URL by a short ID
 	GetFull(ctx context.Context, shortID string) (fullURL string, err error)
 }

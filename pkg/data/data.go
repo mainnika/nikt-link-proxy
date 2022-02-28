@@ -60,17 +60,17 @@ func (d Data) SourceByContext(c context.Context) (source datasource.DataSource) 
 // MakeLink makes a short link data for a given full URL
 func (d *Data) MakeLink(ctx context.Context, fullURL string) (l Link, err error) {
 
-	shortID, err := d.dsource.CreateShortID(ctx)
+	possibleID, err := d.dsource.CreateShortID(ctx)
 	if err != nil {
 		return
 	}
 
-	err = d.dsource.InsertURL(ctx, shortID, fullURL)
+	insertedID, err := d.dsource.InsertURL(ctx, possibleID, fullURL)
 	if err != nil {
 		return
 	}
 
-	l = Link{ID: shortID, FullURL: fullURL}
+	l = Link{ID: insertedID, FullURL: fullURL}
 
 	return
 }
