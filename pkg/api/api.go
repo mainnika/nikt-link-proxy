@@ -34,9 +34,9 @@ func New(config Config) (api *API) {
 
 	apiBase := api.Router.Group(api.Base)
 	apiBase.Get(URLHealthz, api.GetHealthz)
-	apiBase.Get(URLMakeLink, api.GetMakeLinkWithSID)
-	apiBase.Get(URLMakeLinkSID, api.GetMakeLinkWithSID)
-	apiBase.Get(URLResolveLinkID, api.GetResolveLinkID)
+	apiBase.To("GET,HEAD", URLMakeLink, api.GetMakeLinkWithSID)
+	apiBase.To("GET,HEAD", URLMakeLinkSID, api.GetMakeLinkWithSID)
+	apiBase.To("GET,HEAD", URLResolveLinkID, api.GetResolveLinkID)
 
 	return
 }
