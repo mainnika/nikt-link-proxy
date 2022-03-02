@@ -13,7 +13,7 @@ var _ DataInterface = (*Data)(nil)
 // DataInterface is a data handler that manages links
 type DataInterface interface {
 	// MakeLink makes a short link data for a given full URL
-	MakeLink(ctx context.Context, fullURL string) (l Link, err error)
+	MakeLink(ctx context.Context, fullURL string, m Meta) (l Link, err error)
 	// ResolveLink resolves a short link by ID
 	ResolveLink(ctx context.Context, linkID string) (l Link, err error)
 }
@@ -58,7 +58,7 @@ func (d Data) SourceByContext(c context.Context) (source datasource.DataSource) 
 }
 
 // MakeLink makes a short link data for a given full URL
-func (d *Data) MakeLink(ctx context.Context, fullURL string) (l Link, err error) {
+func (d *Data) MakeLink(ctx context.Context, fullURL string, m Meta) (l Link, err error) {
 
 	createdLink, err := NewLink("", fullURL)
 	if err != nil {
@@ -70,7 +70,7 @@ func (d *Data) MakeLink(ctx context.Context, fullURL string) (l Link, err error)
 		return
 	}
 
-	createdLink.ID, err = d.dsource.InsertURL(ctx, possibleID, fullURL)
+	createdLink.ID, err = d.dsource.InsertURL(ctx, possibleID, fullURL, m.Apply)
 	if err != nil {
 		return
 	}

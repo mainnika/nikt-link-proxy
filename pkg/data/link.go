@@ -11,6 +11,8 @@ type Link struct {
 	ID string
 	// URL is the full url to resolve the short link
 	URL *url.URL
+	// Meta
+	Meta Meta
 }
 
 // NewLink creates a new link
