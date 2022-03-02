@@ -5,9 +5,13 @@ import (
 	"github.com/valyala/fasthttp"
 )
 
+const pathKeySID = "sid"
+
 // api schema
 const (
-	URLHealthz = "/healthz"
+	URLHealthz     = "/healthz"
+	URLMakeLink    = "/go"
+	URLMakeLinkSID = "/go/<" + pathKeySID + ">"
 )
 
 // API is the main handler that contains all routes handlers
@@ -28,6 +32,8 @@ func New(config Config) (api *API) {
 
 	apiBase := api.Router.Group(api.Base)
 	apiBase.Get(URLHealthz, api.GetHealthz)
+	apiBase.Get(URLMakeLink, api.GetMakeLinkWithSID)
+	apiBase.Get(URLMakeLinkSID, api.GetMakeLinkWithSID)
 
 	return
 }
