@@ -15,11 +15,13 @@ func (m Meta) Apply(in map[string][]string) (out map[string][]string) {
 
 	out = in
 
-	if m.Ref != "" {
-		out["ref"] = append(out["ref"], m.Ref)
-	}
-	if m.SID != "" {
-		out["sid"] = append(out["sid"], m.SID)
+	for _, pair := range [][2]string{
+		{"ref", m.Ref},
+		{"sid", m.SID},
+	} {
+		if pair[1] != "" {
+			out[pair[0]] = append(out[pair[0]], pair[1])
+		}
 	}
 
 	return
