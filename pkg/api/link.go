@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/json"
 	"net/http"
 	"net/url"
 	"path"
@@ -43,7 +44,7 @@ func (api *API) GetMakeLinkWithSID(c *routing.Context) (httpError error) {
 
 	c.Redirect(baseRedirect, http.StatusFound)
 
-	return
+	return c.Write(json.RawMessage{'n', 'u', 'l', 'l'})
 }
 
 // GetResolveLinkID resolves a short link to a full one and makes a http-301 redirect into it.
@@ -59,5 +60,5 @@ func (api *API) GetResolveLinkID(c *routing.Context) (httpError error) {
 
 	c.Redirect(l.URL.String(), http.StatusMovedPermanently)
 
-	return
+	return c.Write(json.RawMessage{'n', 'u', 'l', 'l'})
 }
