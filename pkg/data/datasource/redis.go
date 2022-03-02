@@ -12,11 +12,13 @@ import (
 	"code.tokarch.uk/mainnika/nikt-link-proxy/pkg/utils"
 )
 
+const domainIDdefault = "_"
+
 const (
-	redisKeyLastID      = "lastID"
-	redisKeyURLMetadata = "%s:metadata"
-	redisKeyURLReversed = "%s:reversed"
-	redisKeyURLFull     = "%s:full"
+	redisKeyLastID   = "lastID:%s"
+	redisKeyLink     = "link:%s:%s"
+	redisKeyMetadata = "metadata:%s:%s"
+	redisKeyReversed = "reversed:%s:%s"
 )
 
 const (
@@ -155,9 +157,9 @@ func (r *RedisSource) InsertURL(ctx context.Context, shortID, fullURL string, me
 	cmd := r.EvalSha(ctx,
 		getOrCreate,
 		[]string{
-			r.getKeyURLReversed(hashed[:]),
-			r.getKeyURLFull(shortID),
-			r.getKeyURLMetadata(shortID),
+			r.getKeyReversed(hashed[:]),
+			r.getKeyLink(shortID),
+			r.getKeyMetadata(shortID),
 		},
 		shortID,
 		fullURL,
@@ -169,24 +171,24 @@ func (r *RedisSource) InsertURL(ctx context.Context, shortID, fullURL string, me
 	return
 }
 
-// GetFull loads a saved full URL by a short ID
-func (r *RedisSource) GetFull(ctx context.Context, shortID string) (fullURL string, err error) {
+// GetFull loads a saved full URL by a link ID
+func (r *RedisSource) GetFull(ctx context.Context, linkID string) (fullURL string, err error) {
 
-	stringCmd := r.Get(ctx, r.getKeyURLFull(shortID))
+	stringCmd := r.Get(ctx, r.getKeyLink(linkID))
 	fullURL, err = stringCmd.Result()
 
 	return
 }
 
 func (r *RedisSource) getKeyLastID() string {
-	return redisKeyLastID
+	return fmt.Sprintf(redisKeyLastID, domainIDdefault)
 }
-func (r *RedisSource) getKeyURLMetadata(id string) string {
-	return fmt.Sprintf(redisKeyURLMetadata, id)
+func (r *RedisSource) getKeyLink(id string) string {
+	return fmt.Sprintf(redisKeyLink, domainIDdefault, id)
 }
-func (r *RedisSource) getKeyURLReversed(hash []byte) string {
-	return fmt.Sprintf(redisKeyURLReversed, hash)
+func (r *RedisSource) getKeyReversed(hash []byte) string {
+	return fmt.Sprintf(redisKeyReversed, domainIDdefault, hash)
 }
-func (r *RedisSource) getKeyURLFull(id string) string {
-	return fmt.Sprintf(redisKeyURLFull, id)
+func (r *RedisSource) getKeyMetadata(metadata string) string {
+	return fmt.Sprintf(redisKeyMetadata, domainIDdefault, metadata)
 }
