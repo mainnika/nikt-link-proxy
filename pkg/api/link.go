@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"net/url"
 	"path"
+	"strings"
 
 	routing "github.com/jackwhelpton/fasthttp-routing/v2"
 
@@ -41,6 +42,22 @@ func (api *API) GetMakeLinkWithSID(c *routing.Context) (httpError error) {
 	baseRedirect := path.Join("/", api.Base, shortLink.ID)
 
 	c.Redirect(baseRedirect, http.StatusFound)
+
+	return
+}
+
+// GetResolveLinkID resolves a short link to a full one and makes a http-301 redirect into it.
+func (api *API) GetResolveLinkID(c *routing.Context) (httpError error) {
+
+	linkID := c.Param(pathKeyLinkID)
+	linkID = strings.TrimSpace(linkID)
+
+	l, err := api.Data.ResolveLink(c, linkID)
+	if err != nil {
+		return NewHTTPError(http.StatusNotFound, err.Error())
+	}
+
+	c.Redirect(l.URL.String(), http.StatusMovedPermanently)
 
 	return
 }

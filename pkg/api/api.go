@@ -6,12 +6,14 @@ import (
 )
 
 const pathKeySID = "sid"
+const pathKeyLinkID = "linkID"
 
 // api schema
 const (
-	URLHealthz     = "/healthz"
-	URLMakeLink    = "/go"
-	URLMakeLinkSID = "/go/<" + pathKeySID + ">"
+	URLHealthz       = "/healthz"
+	URLMakeLink      = "/go"
+	URLMakeLinkSID   = "/go/<" + pathKeySID + ">"
+	URLResolveLinkID = "/<" + pathKeyLinkID + ">"
 )
 
 // API is the main handler that contains all routes handlers
@@ -34,6 +36,7 @@ func New(config Config) (api *API) {
 	apiBase.Get(URLHealthz, api.GetHealthz)
 	apiBase.Get(URLMakeLink, api.GetMakeLinkWithSID)
 	apiBase.Get(URLMakeLinkSID, api.GetMakeLinkWithSID)
+	apiBase.Get(URLResolveLinkID, api.GetResolveLinkID)
 
 	return
 }
