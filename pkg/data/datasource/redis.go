@@ -27,20 +27,16 @@ const (
 
 var redisScriptsData = map[int]string{
 	RedisScriptIDGetOrCreate: `
-local existedShort = redis.call("get", KEYS[1]) or ""
-if existedShort ~= "" then
-  return existedShort
+-- KEYS[1], ARGV[1] → redisKeyReversed, linkID
+-- KEYS[2], ARGV[2] → redisKeyLink, fullURL
+-- KEYS[3], ARGV[3] → redisKeyMetadata, metadata
+
+local newlyCreated = redis.call("MSETNX", KEYS[1], ARGV[1], KEYS[2], ARGV[2], KEYS[3], ARGV[3])
+if newlyCreated == 1 then
+  return ARGV[1]
 end
 
-local isSet = redis.call("setnx", KEYS[2], ARGV[2])
-if isSet == 0 then
-  return error("dup")
-end
-
-redis.call("set", KEYS[1], ARGV[1])
-redis.call("set", KEYS[3], ARGV[3])
-
-return ARGV[1]
+return redis.call("GET", KEYS[1])
 `,
 }
 
