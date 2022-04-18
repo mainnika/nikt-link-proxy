@@ -69,8 +69,9 @@ func Serve(cmd *cobra.Command, args []string) {
 	}
 
 	apiHandler := api.New(api.Config{
-		Base: config.Base,
-		Data: apiData,
+		RootRedirect: config.RootRedirect,
+		Base:         config.Base,
+		Data:         apiData,
 	})
 
 	httpServer := fasthttp.Server{

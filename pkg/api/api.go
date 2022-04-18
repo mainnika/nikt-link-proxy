@@ -10,6 +10,7 @@ const pathKeyLinkID = "linkID"
 
 // api schema
 const (
+	URLRoot    = "/"
 	URLHealthz = "/healthz"
 
 	URLSIDBinary   = "/<" + pathKeySID + ">/binary/*"
@@ -38,6 +39,8 @@ func New(config Config) (api *API) {
 	api.Router.NotFound(api.ErrorNotFound)
 
 	apiBase := api.Router.Group(api.Base)
+
+	apiBase.Get(URLRoot, api.Root)
 
 	apiBase.Get(URLHealthz, api.GetHealthz)
 

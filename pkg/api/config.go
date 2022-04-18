@@ -6,6 +6,7 @@ import (
 
 // Config contains externally configurable data
 type Config struct {
-	Base string
-	Data data.DataInterface
+	RootRedirect string
+	Base         string
+	Data         data.DataInterface
 }
