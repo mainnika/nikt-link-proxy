@@ -14,8 +14,8 @@ import (
 
 var _ routing.DataWriter = (*JSONWriter)(nil)
 
-// staticWriter is thread-safe static instance of JSON writer
-var staticWriter = &JSONWriter{}
+// jsonWriter is thread-safe static instance of JSON writer
+var jsonWriter = &JSONWriter{}
 
 // null ready-to-use response
 var nullBytes = []byte("null")
@@ -51,6 +51,6 @@ func (jw *JSONWriter) Write(w io.Writer, content interface{}) (err error) {
 
 // UseJSONWriter is the routing middleware to set the default data writer
 func (api *API) UseJSONWriter(c *routing.Context) (_ error) {
-	c.SetDataWriter(staticWriter)
+	c.SetDataWriter(jsonWriter)
 	return
 }

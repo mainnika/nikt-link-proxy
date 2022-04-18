@@ -86,6 +86,7 @@ func (api *API) UseErrorHandler(c *routing.Context) (err error) {
 		return
 	}
 
+	c.SetDataWriter(jsonWriter)
 	c.Abort()
 
 	logrus.Warnf("Cannot process request, %v", err)
