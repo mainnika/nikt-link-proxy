@@ -10,9 +10,14 @@ const pathKeyLinkID = "linkID"
 
 // api schema
 const (
-	URLHealthz       = "/healthz"
-	URLMakeLink      = "/go"
-	URLMakeLinkSID   = "/go/<" + pathKeySID + ">"
+	URLHealthz = "/healthz"
+
+	URLSIDBinary   = "/<" + pathKeySID + ">/binary/*"
+	URLSIDMakeLink = "/<" + pathKeySID + ">/go"
+
+	URLBinary   = "/binary/*"
+	URLMakeLink = "/go"
+
 	URLResolveLinkID = "/<" + pathKeyLinkID + ">"
 )
 
@@ -33,9 +38,15 @@ func New(config Config) (api *API) {
 	api.Router.NotFound(api.ErrorNotFound)
 
 	apiBase := api.Router.Group(api.Base)
+
 	apiBase.Get(URLHealthz, api.GetHealthz)
+
+	apiBase.Get(URLBinary, api.UseTemplateWriter, api.GetBinary)
+	apiBase.Get(URLSIDBinary, api.UseTemplateWriter, api.GetBinary)
+
 	apiBase.To("GET,HEAD", URLMakeLink, api.GetMakeLinkWithSID)
-	apiBase.To("GET,HEAD", URLMakeLinkSID, api.GetMakeLinkWithSID)
+	apiBase.To("GET,HEAD", URLSIDMakeLink, api.GetMakeLinkWithSID)
+
 	apiBase.To("GET,HEAD", URLResolveLinkID, api.GetResolveLinkID)
 
 	return
