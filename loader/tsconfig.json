@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "lib": [
+      "ES6",
+      "DOM"
+    ],
+    "target": "es6",
+    "module": "amd",
+    "noImplicitAny": true,
+    "removeComments": true,
+    "preserveConstEnums": true,
+    "outDir": "./binary",
+    "sourceMap": true
+  },
+  "include": [
+    "./src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "**/*.spec.ts"
+  ]
+}

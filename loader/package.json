@@ -1,0 +1,24 @@
+{
+  "name": "nikt-link-proxy-loader",
+  "version": "1.0.0",
+  "description": "A bit more than just a shortener.",
+  "main": "src/loader.ts",
+  "scripts": {
+    "test": "true",
+    "build-loader": "npx tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://code.tokarch.uk/mainnika/nikt-link-proxy.git",
+    "directory": "loader"
+  },
+  "keywords": [
+    "url",
+    "shortener"
+  ],
+  "author": "Nikita Tokarchuk <nikita@tokarch.uk>",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^4.6.2"
+  }
+}

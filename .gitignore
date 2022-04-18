@@ -25,5 +25,7 @@ _testmain.go
 
 \.idea/
 \.vscode/
+loader/node_modules/
+loader/binary/
 
 nikt-link-proxy
