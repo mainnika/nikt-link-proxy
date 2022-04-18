@@ -14,23 +14,29 @@ class ReplaceObserver extends MutationObserver {
 
     private static readonly SLASH_SEP = "/";
 
-    private targetURL: string;
+    private readonly targetURL: string;
+    private readonly disabled: boolean;
 
-    constructor() {
+    constructor(targetURL?: string) {
         super(ReplaceObserver.onMutate);
         this.targetURL = "";
+        this.disabled = false;
 
-        const urlParts = scriptURL.split(ReplaceObserver.SLASH_SEP)
-        while (urlParts.length) {
-            if (urlParts.pop() === "bin") {
-                break;
+        if (targetURL) {
+            this.targetURL = targetURL;
+        } else {
+            const urlParts = scriptURL.split(ReplaceObserver.SLASH_SEP)
+            while (urlParts.length) {
+                if (urlParts.pop() === "binary") {
+                    break;
+                }
+            }
+            if (urlParts.length) {
+                this.targetURL = urlParts.concat("go").join(ReplaceObserver.SLASH_SEP)
+            } else {
+                this.disabled = true;
             }
         }
-        if (urlParts.length) {
-            this.targetURL = urlParts.concat("go").join(ReplaceObserver.SLASH_SEP)
-        }
-
-        console.log(this.targetURL)
     }
 
     private static onMutate(mutations: MutationRecord[], observer: MutationObserver) {
@@ -53,7 +59,7 @@ class ReplaceObserver extends MutationObserver {
         if (!addedNode.getElementsByTagName) {
             return;
         }
-        if (!this.targetURL) {
+        if (this.disabled) {
             return;
         }
 
@@ -82,7 +88,7 @@ class ReplaceObserver extends MutationObserver {
     }
 }
 
-const replacer = new ReplaceObserver();
+const replacer = new ReplaceObserver(loader.targetURL);
 
 replacer.replace(document);
 replacer.observe(document, observerConfig);
