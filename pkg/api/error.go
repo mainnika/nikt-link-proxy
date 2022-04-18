@@ -3,6 +3,7 @@ package api
 import (
 	"fmt"
 	"net/http"
+	"runtime/debug"
 
 	routing "github.com/jackwhelpton/fasthttp-routing/v2"
 	"github.com/sirupsen/logrus"
@@ -69,6 +70,8 @@ func (api *API) UseErrorHandler(c *routing.Context) (err error) {
 			if r == nil {
 				return
 			}
+
+			debug.PrintStack()
 
 			err = NewHTTPError(
 				http.StatusInternalServerError,
