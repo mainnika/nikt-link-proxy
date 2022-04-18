@@ -2,6 +2,8 @@ module code.tokarch.uk/mainnika/nikt-link-proxy
 
 go 1.17
 
+replace overridable/loader => ./loader
+
 require (
 	github.com/gavv/httpexpect v2.0.0+incompatible
 	github.com/go-redis/redis/v8 v8.11.4
@@ -14,6 +16,7 @@ require (
 	github.com/spf13/viper v1.10.1
 	github.com/stretchr/testify v1.7.0
 	github.com/valyala/fasthttp v1.33.0
+	overridable/loader v0.0.0
 )
 
 require (
