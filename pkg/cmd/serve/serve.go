@@ -75,6 +75,7 @@ func Serve(cmd *cobra.Command, args []string) {
 	})
 
 	httpServer := fasthttp.Server{
+		Name:    "stm32f103c8t6",
 		Logger:  logrus.StandardLogger(),
 		Handler: apiHandler.Handler(),
 	}
