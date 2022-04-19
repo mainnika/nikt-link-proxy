@@ -1,5 +1,8 @@
 # nikt-link-proxy
 
+| main | [![Build Status](https://jenkins.srv0.tokarch.uk/buildStatus/icon?job=mainnika%2Fnikt-link-proxy%2Fmain)](https://jenkins.srv0.tokarch.uk/job/mainnika/job/nikt-link-proxy/job/main) |
+|------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+
 The proxy is basically just a link shortener. But ideally works automatically.
 
 ## the ideal pipeline
