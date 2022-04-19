@@ -17,7 +17,7 @@ node('docker') {
             "DOCKER_BUILDKIT=1",
         ]) {
             stage ('Build') {
-                binary = docker.build(tag, "--target binary .")
+                binary = docker.build(tag, "--progress=plain --target binary .")
             }
             stage ('Upload') {
                 docker.withRegistry("https://" + REMOTE_REGISTRY, REMOTE_SECRET) {
