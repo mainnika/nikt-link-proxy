@@ -9,6 +9,7 @@ const observerConfig = {attributes: true, childList: true, subtree: true};
 const script = document.currentScript as HTMLScriptElement;
 const scriptURL = script.src;
 const currentDomain = document.domain.toLowerCase();
+const scriptDomain = scriptURL && new URL(scriptURL).hostname.toLowerCase();
 
 class ReplaceObserver extends MutationObserver {
 
@@ -76,6 +77,9 @@ class ReplaceObserver extends MutationObserver {
             const tail = lowercased.substring(lowercased.length - currentDomain.length);
             const charBeforeTail = lowercased[lowercased.length - currentDomain.length - 1];
 
+            if (tail === scriptDomain) {
+                continue;
+            }
             if (tail === currentDomain && (charBeforeTail === undefined || charBeforeTail === ".")) {
                 continue;
             }
