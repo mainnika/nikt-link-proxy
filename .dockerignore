@@ -1,0 +1,8 @@
+*
+!loader
+loader/node_modules
+loader/binary
+!pkg
+!config.yaml
+!go.sum
+!go.mod
