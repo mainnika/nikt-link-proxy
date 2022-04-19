@@ -19,7 +19,7 @@ node('k8s') {
                 defaultValue: "nikt-link-proxy",
                 description: "release namespace",
             ),
-            password(
+            string(
                 name: "CREDENTIALS_ID",
                 defaultValue: "nikt-link-proxy-config",
                 description: "release configuration",
