@@ -27,5 +27,7 @@ _testmain.go
 \.vscode/
 loader/node_modules/
 loader/binary/
+chart/nikt-link-proxy.values.yaml
 
 nikt-link-proxy
+main
