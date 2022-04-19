@@ -24,6 +24,15 @@ node('docker') {
                     binary.push()
                 }
             }
+            stage ('Deploy') {
+                if (env.BRANCH_NAME == DEPLOY_BRANCH) {
+                    build job: '../nikt-link-proxy-deploy', wait: false, parameters: [
+                              string(name: 'VERSION', value: PROJECT_VERSION),
+                              string(name: 'RELEASE_NAME', value: "nikt-link-proxy"),
+                              string(name: 'RELEASE_NAMESPACE', value: "nikt-link-proxy"),
+                          ]
+                }
+            }
         }
     } finally {
         sh "docker rmi -f ${tag}        || true"
