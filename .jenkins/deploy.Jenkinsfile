@@ -1,32 +1,36 @@
 node('k8s') {
 
+    properties([
+        disableConcurrentBuilds(),
+        disableResume(),
+        parameters([
+            string(
+                name: "VERSION",
+                defaultValue: "main",
+                description: "version to release",
+            ),
+            string(
+                name: "RELEASE_NAME",
+                defaultValue: "nikt-link-proxy",
+                description: "release name",
+            ),
+            string(
+                name: "RELEASE_NAMESPACE",
+                defaultValue: "nikt-link-proxy",
+                description: "release namespace",
+            ),
+            password(
+                name: "CREDENTIALS_ID",
+                defaultValue: "nikt-link-proxy-config",
+                description: "release configuration",
+            ),
+        ]),
+    ])
+
     def HELM_DOWNLOAD_URL = "https://get.helm.sh/helm-v3.7.2-linux-amd64.tar.gz"
     def WS_DIST = ".dist"
     def WS_BIN = ".bin"
     def WS_SCM = ".scm"
-
-    parameters {
-        string(
-            name: "VERSION",
-            defaultValue: "main",
-            description: "version to release",
-        )
-        string(
-            name: "RELEASE_NAME",
-            defaultValue: "nikt-link-proxy",
-            description: "release name",
-        )
-        string(
-            name: "RELEASE_NAMESPACE",
-            defaultValue: "nikt-link-proxy",
-            description: "release namespace",
-        )
-        password(
-            name: "CREDENTIALS_ID",
-            defaultValue: "nikt-link-proxy-config",
-            description: "release configuration",
-        )
-    }
 
     try {
         stage ('Download Helm') {
